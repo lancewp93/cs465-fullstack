@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+import { environment } from '../../environments/environment';
 import { Trip } from '../models/trip';
 import { User } from '../models/user';
 import { BROWSER_STORAGE } from '../storage';
@@ -18,8 +19,8 @@ export class TripDataService {
   @Inject(BROWSER_STORAGE) private storage: Storage
   ){}
 
-  url = 'http://localhost:3000/api/trips';
-  baseUrl = 'http://localhost:3000/api';
+  url = `${environment.apiBaseUrl}/trips`;
+  baseUrl = environment.apiBaseUrl;
 
   // Call to our /login endpoint, returns JWT
   login(user: User, passwd: string): Observable<AuthResponse> {

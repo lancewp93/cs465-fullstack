@@ -1,4 +1,5 @@
-const tripsEndpoint = 'http://localhost:3000/api/trips';
+const apiBaseUrl = process.env.API_BASE_URL || 'http://localhost:3000';
+const tripsEndpoint = `${apiBaseUrl}/api/trips`;
 const options = {
     method: 'GET',
     headers: {

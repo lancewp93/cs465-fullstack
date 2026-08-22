@@ -1,122 +1,98 @@
 const mongoose = require('mongoose');
 const Trip = require('../models/travlr');
 const Model = mongoose.model('trips');
+const { validateTripCode, validateTripPayload } = require('../validation');
 
 // GET: /trips - lists all the trips
-// Regardless of outcome, response must include HTML status code
-// and JSON message to the requesting client
 const tripsList = async(req, res) => {
-    const q = await Model
-        .find({}) // Return all records
-        .exec();
-
-        // Uncomment the following line to show results of query
-        // on the console
-        // console.log(q);
-
-    if (!q)
-    { // Database returned no data
-        return res
-            .status(404)
-            .json(err);
-    } else { // Return resulting trip list
-        return res
-            .status(200)
-            .json(q);
+    try {
+        const trips = await Model.find({}).exec();
+        return res.status(200).json(trips);
+    } catch (error) {
+        return res.status(500).json({ message: 'Unable to fetch trips.', error: error.message });
     }
-
 };
 
 // GET: /trips/:tripCode - lists a single trip
-// Regardless of outcome, response must include HTML status code
-// and JSON message to the requesting client
 const tripsFindByCode = async(req, res) => {
-    const q = await Model
-        .find({'code' : req.params.tripCode }) // Return single record
-        .exec();
+    const validationError = validateTripCode(req.params.tripCode);
 
-        // Uncomment the following line to show results of query
-        // on the console
-        // console.log(q);
-
-    if (!q)
-    { // Database returned no data
-        return res
-            .status(404)
-            .json(err);
-    } else { // Return resulting trip list
-        return res
-            .status(200)
-            .json(q);
+    if (validationError) {
+        return res.status(400).json({ message: validationError });
     }
 
+    try {
+        const trip = await Model.find({ code: req.params.tripCode }).exec();
+
+        if (!trip || trip.length === 0) {
+            return res.status(404).json({ message: 'Trip not found.' });
+        }
+
+        return res.status(200).json(trip);
+    } catch (error) {
+        return res.status(500).json({ message: 'Unable to find trip.', error: error.message });
+    }
 };
 
 // POST: /trips - Adds a new Trip
-// Regardless of outcome, response must include HTML status code
-// and JSON message to the requesting client
 const tripsAddTrip = async(req, res) => {
-    const newTrip = new Trip({
-        code: req.body.code,
-        name: req.body.name,
-        length: req.body.length,
-        start: req.body.start,
-        resort: req.body.resort,
-        perPerson: req.body.perPerson,
-        image: req.body.image,
-        description: req.body.description
-    });
+    const validationError = validateTripPayload(req.body);
 
-    const q = await newTrip.save();
-
-    if (!q)
-    { // Database returned no data
-        return res
-            .status(404)
-            .json(err);
-    } else { // Return new trip
-        return res
-            .status(201)
-            .json(q);
+    if (validationError) {
+        return res.status(400).json({ message: validationError });
     }
-    
-    // console.log(q);
-}
 
-// PUT: /trips/:tripCode - Adds a new Trip
-// Regardless of outcome, response must include HTML status code
-// and JSON message to the requesting client
+    try {
+        const newTrip = new Trip({
+            code: req.body.code.trim(),
+            name: req.body.name.trim(),
+            length: req.body.length.trim(),
+            start: req.body.start,
+            resort: req.body.resort.trim(),
+            perPerson: req.body.perPerson.trim(),
+            image: req.body.image.trim(),
+            description: req.body.description.trim()
+        });
+
+        const savedTrip = await newTrip.save();
+        return res.status(201).json(savedTrip);
+    } catch (error) {
+        return res.status(500).json({ message: 'Unable to add trip.', error: error.message });
+    }
+};
+
+// PUT: /trips/:tripCode - Updates a trip
 const tripsUpdateTrip = async(req, res) => {
-    // console.log(req.params);
-    // console.log(req.body);
+    const validationError = validateTripCode(req.params.tripCode) || validateTripPayload(req.body);
 
-    const q = await Model
-        .findOneAndUpdate(
-            { code: req.params.tripCode }, // Find record to update
+    if (validationError) {
+        return res.status(400).json({ message: validationError });
+    }
+
+    try {
+        const updatedTrip = await Model.findOneAndUpdate(
+            { code: req.params.tripCode },
             {
-                code: req.body.code,
-                name: req.body.name,
-                length: req.body.length,
+                code: req.body.code.trim(),
+                name: req.body.name.trim(),
+                length: req.body.length.trim(),
                 start: req.body.start,
-                resort: req.body.resort,
-                perPerson: req.body.perPerson,
-                image: req.body.image,
-                description: req.body.description
-            }
-        )
-        .exec();
+                resort: req.body.resort.trim(),
+                perPerson: req.body.perPerson.trim(),
+                image: req.body.image.trim(),
+                description: req.body.description.trim()
+            },
+            { new: true }
+        ).exec();
 
-        if (!q)
-        { // Database returned no data
-            return res
-                .status(400)
-                .json(err);
-        } else { // Return updated trip
-            return res
-                .status(201)
-                .json(q);
+        if (!updatedTrip) {
+            return res.status(404).json({ message: 'Trip not found.' });
         }
-        // console.log(q);
+
+        return res.status(200).json(updatedTrip);
+    } catch (error) {
+        return res.status(500).json({ message: 'Unable to update trip.', error: error.message });
+    }
 };
 
 module.exports = {

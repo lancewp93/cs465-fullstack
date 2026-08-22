@@ -22,6 +22,7 @@ var passport = require('passport');
 require('./app_api/config/passport');
 
 var app = express();
+const allowedOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:4200';
 
 // view engine setup
 app.set('views', path.join(__dirname, 'app_server', 'views'));
@@ -41,7 +42,7 @@ app.use(passport.initialize());
 
 // Enable CORS
 app.use('/api', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
+  res.header('Access-Control-Allow-Origin', allowedOrigin);
   res.header('Access-Control-Allow-headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   next();
