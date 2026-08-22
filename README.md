@@ -12,6 +12,22 @@ This project demonstrates a complete end-to-end web application for a travel com
 - Secure login and registration using JWTs
 - CRUD operations for trip data
 
+## Architecture
+
+This project combines multiple frontend approaches to demonstrate how different rendering models can work within a single application. The public-facing travel site uses Express and Handlebars for server-rendered pages, while the admin experience is built as an Angular single-page application that updates the UI dynamically without full-page reloads.
+
+The backend uses MongoDB with Mongoose to store application data in JSON-like documents. This approach aligns well with JavaScript-based development and provides flexibility for evolving application requirements. JSON acts as the primary data interchange format between the frontend and backend, enabling consistent communication through REST API requests.
+
+## Development and Testing
+
+During development, the application was refactored to reduce duplication and improve maintainability by introducing reusable Handlebars templates and partials for shared layout structure. This made the server-rendered pages easier to manage and kept repeated HTML sections consistent.
+
+To validate the API, Postman was used to send HTTP requests and confirm status codes, headers, and payloads for different endpoints. MongoDB Compass was also used to inspect the database directly, verifying that records were created, updated, and deleted as expected. Comparing live API responses with database contents helped confirm the backend logic was functioning correctly.
+
+## Reflection
+
+This project strengthened my understanding of how frontend and backend systems interact in a full-stack application. It provided hands-on experience building an end-to-end solution from data modeling and API design through UI development and testing, and it deepened my appreciation for designing systems that are both functional and maintainable.
+
 ## Tech Stack
 
 - Backend: Node.js, Express
