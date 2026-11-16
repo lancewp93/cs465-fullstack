@@ -69,7 +69,7 @@ export class AuthenticationService {
     return { email, name } as User;
   }
 
-  // Login method that leverages the login method in tripDataService
+  // Login method that leverages the login method in tripDataService 
   // Because that method returns an observable, we subscribe to the
   // result and only process when the Observable condition is satisfied
   // Uncomment the two console.log messages for additional debugging
